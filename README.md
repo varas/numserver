@@ -44,3 +44,44 @@ Notes
  - At your discretion, leading zeroes present in the input may be stripped—or not used—when writing output to the log or console.
  - Robust implementations of the Application typically handle more than 2M numbers per 10-second reporting period on a modern MacBook Pro laptop (e.g.: 16 GiB of RAM and a 2.5 GHz Intel i7 processor).
 
+---
+
+## Decisions taken on this implementation
+
+### On product
+
+- Errors are printed to stderr.
+- There are no leading zeroes on the output. As it stores numbers this avoid extra load.
+- Log file is flushed on intervals, if log file write fails these numbers will be retried on the next flush interval.
+- Numbers handled are supossed to fit in memory, otherwise a disk-fetch policy should be added to check for number uniqueness. An approximate-membership-query approach like bloom-filters would fit here to reduce memory consumption and to avoid disk access.
+
+### On design
+
+- Server package wraps the whole *numserver*. 
+- There are no end-to-end tests, as there is no CI env and `make test-stress` acts as nice acceptance test to validate output and evaluate performance.
+- The runtime acts as service wiring (kind of service locator pattern) and life-cycle management.
+- State (numbers and report counts) are managed in a transactional way, so when written if write fails we don’t remove them from the in-memory storage (avoid data loss).
+- State is guaranteed via mutex as usual. For top-notch state management a CRDT approach could used to increase throughput if the amount of supported clients increase on the specs.
+- Some communications, like the reporter stats could be also achieved via go-channel. This will decouple some services, but a dependency-injection this seemed clear and straight forward to me.
+
+## Instructions
+
+### Build
+
+`make build`: builds for localhost
+
+`make build-linux`: builds for real servers
+
+### Run
+
+`bin/numserver`
+
+Optional arguments: `-port PORT` and `-file LOG` can be used, cli help is provided on incorrect arguments usage.
+
+> Client is not provided as plain netcat can be used `nc localhost 4000`
+
+### Test
+
+`make test`
+
+
