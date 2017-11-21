@@ -82,6 +82,7 @@ Optional arguments: `-port PORT` and `-file LOG` can be used, cli help is provid
 
 ### Test
 
-`make test`
+`make test`: Unit & integration tests
 
+`make test-stress`: Stress test, used as acceptance test
 
