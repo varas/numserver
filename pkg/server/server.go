@@ -3,7 +3,13 @@ package server
 import (
 	"context"
 
-	"bitbucket.org/jhvaras/numserver/src/errhandler"
+	"net"
+
+	"os"
+	"os/signal"
+	"syscall"
+
+	"bitbucket.org/jhvaras/numserver/pkg/errhandler"
 	"github.com/pkg/errors"
 )
 
@@ -29,33 +35,42 @@ func (s *NumServer) Run(ctx context.Context) {
 	err := s.runtime.start(ctx, s.config, s.errHandle)
 	if err != nil {
 		s.errHandle(errors.Wrap(err, "error on start"))
-	}
-	defer s.runtime.stop()
-
-	concurrency := newConcurrencyManager(s.config.concurrentClients)
-
-	termination := make(chan struct{})
-	go func() {
-		<-termination
-		s.runtime.stop()
 		return
-	}()
+	}
+
+	conns := make(chan net.Conn)
+	termination := make(chan struct{})
+
+	for w := s.config.concurrentClients; w >= 0; w-- {
+		go s.runtime.connHandler.run(ctx, conns, termination)
+	}
+
+	go s.waitForClientTermination(termination)
+	go s.waitForSystemTermination()
 
 	close(s.Ready)
 
 	for {
-		conn, err := s.runtime.acceptConn()
+		conn, err := s.runtime.listener.Accept()
 		if err != nil {
-			s.errHandle(errors.Wrap(err, "error accepting connections"))
-			continue
+			if s.runtime.isUp {
+				s.errHandle(errors.Wrap(err, "cannot accept connections"))
+			}
+			return
 		}
 
-		concurrency.AddTaskOrWait()
-
-		go func() {
-			s.runtime.handle(ctx, conn, termination)
-
-			concurrency.FinishTask()
-		}()
+		conns <- conn
 	}
+}
+
+func (s *NumServer) waitForSystemTermination() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	<-c
+	s.runtime.stop()
+}
+
+func (s *NumServer) waitForClientTermination(termination chan struct{}) {
+	<-termination
+	s.runtime.stop()
 }

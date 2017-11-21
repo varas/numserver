@@ -6,12 +6,13 @@ import (
 	"math/rand"
 	"net"
 	"testing"
+	"time"
 
 	"os"
 
 	"sync"
 
-	"bitbucket.org/jhvaras/numserver/src/errhandler"
+	"bitbucket.org/jhvaras/numserver/pkg/errhandler"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -82,7 +83,7 @@ func TestNumServer_DoesNotHandleErrorsOnValidInput(t *testing.T) {
 }
 
 func TestNumServer_SupportsConcurrentClientWrites(t *testing.T) {
-	numClients := 5 // TODO extract maxnumclients
+	numClients := DefaultConcurrentClients
 
 	port := runServer(errhandler.Noop)
 
@@ -141,9 +142,9 @@ func runServerAndClient(errHandler errhandler.ErrHandler) (client net.Conn, err 
 // range: 49152 to 65535
 // https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
 func randPort() int {
-	portRange := 65535 - 49152
+	rand.Seed(int64(time.Now().Nanosecond()))
 
-	return 49152 + rand.Intn(portRange)
+	return 49152 + rand.Intn(65535-49152)
 }
 
 func countHandler(wg *sync.WaitGroup) (errhandler.ErrHandler, *int) {

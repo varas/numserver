@@ -1,2 +1,7 @@
 /numbers.log
-testdata/
+/bin/*
+!/bin/.gitkeep
+pkg/server/testdata/*
+pkg/result/testdata/*
+!pkg/server/testdata/.gitkeep
+!pkg/result/testdata/.gitkeep

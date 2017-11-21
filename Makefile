@@ -15,7 +15,7 @@ test: dependencies
 	go test -race $(PACKAGES)
 
 test-verbose: dependencies
-	go test -v $(PACKAGES)
+	go test -race -v $(PACKAGES)
 
 lint: tools
 	fgt go fmt $(PACKAGES)
@@ -30,5 +30,8 @@ tools:
 	go get $(GOTOOLS)
 .SILENT: tools
 
-tools-update:
-	go get -u $(GOTOOLS)
+build: dependencies
+	go build -o bin/numserver
+
+build-linux: dependencies
+	GOOS=linux GOARCH=amd64 go build -o bin/numserver

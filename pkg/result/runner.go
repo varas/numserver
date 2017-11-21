@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"bitbucket.org/jhvaras/numserver/src/repository"
+	"bitbucket.org/jhvaras/numserver/pkg/repository"
 )
 
 // Runner prints a flush to standard output every 10 seconds

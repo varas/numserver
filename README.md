@@ -43,3 +43,4 @@ Notes
  - Your Application may not for any part of its operation use or require the use of external systems, for example Apache Kafka or Redis.
  - At your discretion, leading zeroes present in the input may be stripped—or not used—when writing output to the log or console.
  - Robust implementations of the Application typically handle more than 2M numbers per 10-second reporting period on a modern MacBook Pro laptop (e.g.: 16 GiB of RAM and a 2.5 GHz Intel i7 processor).
+
