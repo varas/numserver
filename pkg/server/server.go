@@ -9,8 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"bitbucket.org/jhvaras/numserver/pkg/errhandler"
 	"github.com/pkg/errors"
+	"github.com/varas/numserver/pkg/errhandler"
 )
 
 // NumServer tcp server that store unique numbers writen

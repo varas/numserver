@@ -12,8 +12,8 @@ import (
 
 	"sync"
 
-	"bitbucket.org/jhvaras/numserver/pkg/errhandler"
 	"github.com/stretchr/testify/assert"
+	"github.com/varas/numserver/pkg/errhandler"
 )
 
 var (

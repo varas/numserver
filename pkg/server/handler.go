@@ -6,10 +6,10 @@ import (
 	"io"
 	"net"
 
-	"bitbucket.org/jhvaras/numserver/pkg/errhandler"
-	"bitbucket.org/jhvaras/numserver/pkg/line"
-	"bitbucket.org/jhvaras/numserver/pkg/report"
-	"bitbucket.org/jhvaras/numserver/pkg/repository"
+	"github.com/varas/numserver/pkg/errhandler"
+	"github.com/varas/numserver/pkg/line"
+	"github.com/varas/numserver/pkg/report"
+	"github.com/varas/numserver/pkg/repository"
 )
 
 type connHandler struct {

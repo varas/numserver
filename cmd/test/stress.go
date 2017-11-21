@@ -10,7 +10,7 @@ import (
 
 	"flag"
 
-	"bitbucket.org/jhvaras/numserver/pkg/server"
+	"github.com/varas/numserver/pkg/server"
 )
 
 var (
