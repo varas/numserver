@@ -21,7 +21,7 @@ type InMemoryRepository struct {
 	sync.RWMutex
 }
 
-// NewInMemoryRepository ...
+// NewInMemoryRepository stores numbers in memory
 func NewInMemoryRepository() NumberRepository {
 	return &InMemoryRepository{
 		uniques:      make(map[uint32]struct{}),

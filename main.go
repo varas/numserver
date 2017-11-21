@@ -13,7 +13,7 @@ import (
 
 var (
 	port = flag.Int("port", server.DefaultPort, fmt.Sprintf("-port %d", server.DefaultPort))
-	file = flag.String("file", server.DefaultFile, fmt.Sprintf("-file %s", server.DefaultFile))
+	file = flag.String("file", server.DefaultLogFile, fmt.Sprintf("-file %s", server.DefaultLogFile))
 	// we could also add other config params like:
 	// * concurrentClients
 	// * resultFlushInterval

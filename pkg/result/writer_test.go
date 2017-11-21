@@ -6,6 +6,8 @@ import (
 	"os"
 	"testing"
 
+	"strings"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,12 +17,24 @@ var (
 )
 
 func TestWriter_Write(t *testing.T) {
-	w, err := NewWriter(testFilePath)
+	numbers := []uint32{123456789, 001, 002}
+
+	w, err := NewWriter(testFilePath, 2)
 	assert.NoError(t, err)
 
-	assert.NoError(t, w.Write([]uint32{123456789, 001}))
+	assert.NoError(t, w.Write(numbers))
 
-	content, err := ioutil.ReadFile(testFilePath)
+	assertFileContains(t, testFilePath, numbers)
+}
+
+func assertFileContains(t *testing.T, filePath string, expectedNumbers []uint32) {
+	content, err := ioutil.ReadFile(filePath)
 	assert.NoError(t, err)
-	assert.Equal(t, "1\n123456789\n", string(content), "expected LIFO order with no leading zeroes")
+
+	linesAmount := strings.Count(string(content), "\n")
+	assert.Equal(t, len(expectedNumbers), linesAmount, "lines amount does not match numbers amount")
+
+	for _, n := range expectedNumbers {
+		assert.True(t, strings.Contains(string(content), fmt.Sprintf("%d\n", n)))
+	}
 }

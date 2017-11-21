@@ -11,13 +11,13 @@ import (
 // * The total number of unique numbers received for this run of the Application.
 // * Example text: Received 50 unique numbers, 2 duplicates. Unique total: 567231
 type Report struct {
+	sync.Mutex
 	uniqueDiff    uint
 	duplicateDiff uint
 	uniqueTotal   uint
-	sync.Mutex
 }
 
-// Increase ...
+// Increase increases count for unique or duplicated
 func (r *Report) Increase(unique bool) {
 	r.Lock()
 	if unique {

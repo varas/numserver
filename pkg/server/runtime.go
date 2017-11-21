@@ -35,14 +35,14 @@ func (r *runtime) start(ctx context.Context, c config, errHandle errhandler.ErrH
 		return fmt.Errorf("cannot listen on socket tcp/%d error: %s", c.port, err.Error())
 	}
 
-	r.resultWriter, err = result.NewWriter(c.logPath)
+	r.resultWriter, err = result.NewWriter(c.logPath, c.logFlushBatchSize)
 	if err != nil {
 		return fmt.Errorf("cannot create result writer: %s", err.Error())
 	}
 
 	numberRepository := repository.NewInMemoryRepository()
 	reportRunner := report.NewRunner(c.reportFlushInterval)
-	resultRunner := result.NewRunner(c.resultFlushInterval, r.resultWriter, numberRepository)
+	resultRunner := result.NewRunner(c.logFlushInterval, r.resultWriter, numberRepository)
 	lineValidator, err := line.NewValidator()
 	if err != nil {
 		return fmt.Errorf("cannot create line validator: %s", err.Error())

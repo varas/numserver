@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// NumServer ...
+// NumServer tcp server that store unique numbers writen
 type NumServer struct {
 	config    config
 	runtime   runtime
@@ -21,7 +21,7 @@ type NumServer struct {
 	Ready     chan struct{} // reads block until runtime bootstraps
 }
 
-// NewNumServer ...
+// NewNumServer generates a new num-server
 func NewNumServer(port int, logPath string) *NumServer {
 	return &NumServer{
 		config:    *newConfig(port, logPath),
@@ -47,6 +47,7 @@ func (s *NumServer) Run(ctx context.Context) {
 
 	go s.waitForClientTermination(termination)
 	go s.waitForSystemTermination()
+	go s.waitForContexTermination(ctx)
 
 	close(s.Ready)
 
@@ -72,5 +73,10 @@ func (s *NumServer) waitForSystemTermination() {
 
 func (s *NumServer) waitForClientTermination(termination chan struct{}) {
 	<-termination
+	s.runtime.stop()
+}
+
+func (s *NumServer) waitForContexTermination(ctx context.Context) {
+	<-ctx.Done()
 	s.runtime.stop()
 }

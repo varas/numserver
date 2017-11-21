@@ -14,7 +14,7 @@ type Runner struct {
 	numberRepo repository.NumberRepository
 }
 
-// NewRunner ...
+// NewRunner creates a new daemon to write results on each interval
 func NewRunner(interval time.Duration, writer *Writer, numberRepo repository.NumberRepository) *Runner {
 	return &Runner{
 		interval:   interval,
@@ -23,7 +23,7 @@ func NewRunner(interval time.Duration, writer *Writer, numberRepo repository.Num
 	}
 }
 
-// Run ...
+// Run runs writing results on each interval
 func (r *Runner) Run(ctx context.Context) (err error) {
 	ticker := time.NewTicker(r.interval)
 

@@ -17,7 +17,11 @@ test: dependencies
 test-verbose: dependencies
 	go test -race -v $(PACKAGES)
 
-lint: tools
+test-stress:
+	go run cmd/test/stress.go
+
+lint:
+	go get $(GOTOOLS)
 	fgt go fmt $(PACKAGES)
 	fgt goimports -w $(SOURCES)
 	echo $(PACKAGES) | xargs -L1 fgt golint
@@ -25,10 +29,6 @@ lint: tools
 	fgt errcheck -ignore Close $(PACKAGES)
 	staticcheck $(PACKAGES)
 .SILENT: lint
-
-tools:
-	go get $(GOTOOLS)
-.SILENT: tools
 
 build: dependencies
 	go build -o bin/numserver

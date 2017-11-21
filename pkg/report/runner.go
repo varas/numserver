@@ -13,7 +13,7 @@ type Runner struct {
 	count    Report
 }
 
-// NewRunner ...
+// NewRunner creates a report runner daemon
 func NewRunner(interval time.Duration) *Runner {
 	return &Runner{
 		interval: interval,
@@ -22,7 +22,7 @@ func NewRunner(interval time.Duration) *Runner {
 	}
 }
 
-// Run ...
+// Run runs reporting on each interval
 func (r *Runner) Run(ctx context.Context) (err error) {
 	ticker := time.NewTicker(r.interval)
 

@@ -5,26 +5,33 @@ import "time"
 // Default config values
 const (
 	DefaultPort                = 4000
-	DefaultFile                = "numbers.log"
+	DefaultLogFile             = "numbers.log"
+	DefaultLogFlushBatchSize   = 1000
+	DefaultLogFlushInterval    = 1 * time.Second
+	DefaultReportFlushInterval = 1 * time.Second
 	DefaultConcurrentClients   = 5
-	DefaultResultFlushInterval = 1 * time.Second
-	DefaultReportFlushInterval = 10 * time.Second
 )
 
 type config struct {
-	port                int
-	logPath             string
-	concurrentClients   int
-	resultFlushInterval time.Duration
+	port    int
+	logPath string
+	// write numbers to file in batches
+	logFlushBatchSize int
+	// flush to log interval
+	logFlushInterval time.Duration
+	// report interval
 	reportFlushInterval time.Duration
+	// allowed concurrent clients
+	concurrentClients int
 }
 
 func newConfig(port int, logPath string) *config {
 	return &config{
 		port:                port,
 		logPath:             logPath,
-		concurrentClients:   DefaultConcurrentClients,
-		resultFlushInterval: DefaultResultFlushInterval,
+		logFlushBatchSize:   DefaultLogFlushBatchSize,
+		logFlushInterval:    DefaultLogFlushInterval,
 		reportFlushInterval: DefaultReportFlushInterval,
+		concurrentClients:   DefaultConcurrentClients,
 	}
 }

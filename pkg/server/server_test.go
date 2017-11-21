@@ -18,7 +18,7 @@ import (
 
 var (
 	testDataFolder = "testdata"
-	testFilePath   = fmt.Sprintf("%s%s%s", testDataFolder, string(os.PathSeparator), DefaultFile)
+	testFilePath   = fmt.Sprintf("%s%s%s", testDataFolder, string(os.PathSeparator), DefaultLogFile)
 	// inputs:
 	validOneLineInput   = "314159265\n"
 	validMultiLineInput = "007007009\n314159265\n"
