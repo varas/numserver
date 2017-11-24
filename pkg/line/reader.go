@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const terminationLine = "termination"
+const terminationLine = "terminate"
 
 // ErrTermination error returned on termination input read
 var ErrTermination = errors.New("termination")

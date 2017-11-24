@@ -11,7 +11,7 @@ func TestLineValidator_ReturnsTrueOnValidLines(t *testing.T) {
 		"123456789\n",
 		"314159265\n",
 		"007007009\n",
-		"termination\n",
+		"terminate\n",
 	}
 
 	v, err := NewValidator()
