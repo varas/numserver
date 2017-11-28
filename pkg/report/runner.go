@@ -10,15 +10,15 @@ import (
 type Runner struct {
 	interval time.Duration
 	output   *os.File
-	count    Report
+	count    *Report
 }
 
 // NewRunner creates a report runner daemon
-func NewRunner(interval time.Duration) *Runner {
+func NewRunner(interval time.Duration, report *Report) *Runner {
 	return &Runner{
 		interval: interval,
 		output:   os.Stdout,
-		count:    Report{},
+		count:    report,
 	}
 }
 
@@ -38,11 +38,6 @@ func (r *Runner) Run(ctx context.Context) (err error) {
 			}
 		}
 	}
-}
-
-// Increase increases report count
-func (r *Runner) Increase(unique bool) {
-	r.count.Increase(unique)
 }
 
 func (r *Runner) report() error {

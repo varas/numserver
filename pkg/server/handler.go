@@ -16,39 +16,46 @@ type connHandler struct {
 	errHandle        errhandler.ErrHandler
 	lineValidator    *line.Validator
 	numberRepository repository.NumberRepository
-	reportRunner     *report.Runner
+	report           *report.Report
+	conns            <-chan net.Conn
+	terminate        chan struct{}
 }
 
 func newConnHandler(
 	errHandle errhandler.ErrHandler,
 	lineValidator *line.Validator,
 	numberRepo repository.NumberRepository,
-	reportRunner *report.Runner,
+	report *report.Report,
+	conns <-chan net.Conn,
+	terminate chan struct{},
 ) *connHandler {
 	return &connHandler{
 		errHandle:        errHandle,
 		lineValidator:    lineValidator,
 		numberRepository: numberRepo,
-		reportRunner:     reportRunner,
+		report:           report,
+		conns:            conns,
+		terminate:        terminate,
 	}
 }
 
-func (r *connHandler) run(ctx context.Context, conns <-chan net.Conn, termination chan struct{}) {
+func (r *connHandler) run(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
 
-		case <-termination:
-			return
-
-		case c := <-conns:
-			r.handle(c, termination)
+		case c, open := <-r.conns:
+			if !open {
+				return
+			}
+			r.handle(ctx, c)
 		}
 	}
 }
 
-func (r *connHandler) handle(conn net.Conn, termination chan struct{}) {
+// context unhandled here to avoid data loss, as client has no guarantees of sent data is processed on service stop
+func (r *connHandler) handle(ctx context.Context, conn net.Conn) {
 	defer conn.Close()
 	reader := line.NewReader(*bufio.NewReader(conn), r.lineValidator)
 
@@ -59,7 +66,7 @@ func (r *connHandler) handle(conn net.Conn, termination chan struct{}) {
 		}
 
 		if err == line.ErrTermination {
-			close(termination)
+			close(r.terminate)
 			return
 		}
 
@@ -69,6 +76,6 @@ func (r *connHandler) handle(conn net.Conn, termination chan struct{}) {
 		}
 
 		unique := r.numberRepository.AddNumber(num)
-		r.reportRunner.Increase(unique)
+		r.report.Increase(unique)
 	}
 }

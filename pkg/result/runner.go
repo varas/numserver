@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"fmt"
+
 	"github.com/varas/numserver/pkg/repository"
 )
 
@@ -15,12 +17,17 @@ type Runner struct {
 }
 
 // NewRunner creates a new daemon to write results on each interval
-func NewRunner(interval time.Duration, writer *Writer, numberRepo repository.NumberRepository) *Runner {
+func NewRunner(interval time.Duration, logPath string, logFlushBatchSize int, numberRepo repository.NumberRepository) (*Runner, error) {
+	writer, err := NewWriter(logPath, logFlushBatchSize)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create result writer: %s", err.Error())
+	}
+
 	return &Runner{
 		interval:   interval,
 		writer:     writer,
 		numberRepo: numberRepo,
-	}
+	}, nil
 }
 
 // Run runs writing results on each interval
@@ -30,11 +37,14 @@ func (r *Runner) Run(ctx context.Context) (err error) {
 	for {
 		select {
 		case <-ctx.Done():
-			return r.flush()
+			err = r.flush()
+			r.writer.Close()
+			return
 
 		case <-ticker.C:
 			err = r.flush()
 			if err != nil {
+				r.writer.Close()
 				return
 			}
 		}

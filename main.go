@@ -8,6 +8,10 @@ import (
 	"flag"
 	"fmt"
 
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/varas/numserver/pkg/server"
 )
 
@@ -33,5 +37,10 @@ func main() {
 		log.Printf("numserver listening on tcp/%d and writing on %s", *port, *file)
 	}()
 
-	srv.Run(context.Background())
+	go srv.Run(context.Background())
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	<-c
+	close(srv.Stop)
 }

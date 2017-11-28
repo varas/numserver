@@ -57,7 +57,8 @@ Notes
 
 ### On design
 
-- Server package wraps the whole *numserver*. 
+- Server package wraps the whole `numserver`. 
+- `numserver` is aimed to be run as a daemon (unique run method). To enable communication (stop and waits for states) a channel API is given.
 - There are no end-to-end tests, as there is no CI env and `make test-stress` acts as nice acceptance test to validate output and evaluate performance.
 - The runtime acts as service wiring (kind of service locator pattern) and life-cycle management.
 - State (numbers and report counts) are managed in a transactional way, so when written if write fails we don’t remove them from the in-memory storage (avoid data loss).
@@ -85,4 +86,10 @@ Optional arguments: `-port PORT` and `-file LOG` can be used, cli help is provid
 `make test`: Unit & integration tests
 
 `make test-stress`: Stress test, used as acceptance test
+
+## Further work
+
+* Add test coverage and end-to-end test
+* Add benchmark tests
+* Profile cpu & mem usage (pprof)
 

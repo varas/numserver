@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"sync"
+	"sync/atomic"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/varas/numserver/pkg/errhandler"
@@ -60,7 +61,7 @@ func TestNumServer_HandlesErrorsOnInvalidLines(t *testing.T) {
 
 	wg.Wait()
 
-	assert.Equal(t, 2, *handledAmount, "invalid input should cause an error being handled")
+	assert.Equal(t, int32(2), *handledAmount, "invalid input should cause an error being handled")
 }
 
 func TestNumServer_DoesNotHandleErrorsOnValidInput(t *testing.T) {
@@ -79,7 +80,7 @@ func TestNumServer_DoesNotHandleErrorsOnValidInput(t *testing.T) {
 
 	wg.Wait()
 
-	assert.Equal(t, 0, *handledAmount)
+	assert.Equal(t, int32(0), *handledAmount)
 }
 
 func TestNumServer_SupportsConcurrentClientWrites(t *testing.T) {
@@ -147,11 +148,11 @@ func randPort() int {
 	return 49152 + rand.Intn(65535-49152)
 }
 
-func countHandler(wg *sync.WaitGroup) (errhandler.ErrHandler, *int) {
-	handledAmount := 0
+func countHandler(wg *sync.WaitGroup) (errhandler.ErrHandler, *int32) {
+	handledAmount := int32(0)
 
 	return func(e error) {
-		handledAmount++
+		atomic.AddInt32(&handledAmount, 1)
 		wg.Done()
 	}, &handledAmount
 }
