@@ -54,11 +54,13 @@ Notes
 - There are no leading zeroes on the output. As it stores numbers this avoid extra load.
 - Log file is flushed on intervals, if log file write fails these numbers will be retried on the next flush interval.
 - Numbers handled are supossed to fit in memory, otherwise a disk-fetch policy should be added to check for number uniqueness. An approximate-membership-query approach like bloom-filters would fit here to reduce memory consumption and to avoid disk access.
+- 5 concurrent clients input is allowed, exceeding clients are allowed to connect, but their input won't be read until one of the previous clients disconnects.
+- On stop, listener stops listening for new connections and currently ones are handled until disconnect to avoid data loss. As there is no wire protocol, clients won't have any data consistency guarantee otherwise.
 
 ### On design
 
 - Server package wraps the whole `numserver`. 
-- `numserver` is aimed to be run as a daemon (unique run method). To enable communication (stop and waits for states) a channel API is given.
+- `numserver` is aimed to be run as a daemon (unique run method). To enable communication (stop and waits for state changes) a channel API is given.
 - There are no end-to-end tests, as there is no CI env and `make test-stress` acts as nice acceptance test to validate output and evaluate performance.
 - The runtime acts as service wiring (kind of service locator pattern) and life-cycle management.
 - State (numbers and report counts) are managed in a transactional way, so when written if write fails we don’t remove them from the in-memory storage (avoid data loss).
