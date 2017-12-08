@@ -12,6 +12,9 @@ import (
 
 	"sync"
 
+	"os"
+	"runtime/pprof"
+
 	"github.com/varas/numserver/pkg/server"
 )
 
@@ -20,6 +23,7 @@ var (
 	file           = flag.String("file", server.DefaultLogFile, fmt.Sprintf("-file %s", server.DefaultLogFile))
 	clientsAmount  = flag.Int("clients", 5, fmt.Sprintf("-clients 5"))
 	testPeriodSecs = flag.Int("seconds", 10, fmt.Sprintf("-seconds 10"))
+	cpuProfile     = flag.String("cpuprofile", "", "write cpu profile to file, -cpuprofile stress.cpu")
 )
 
 func main() {
@@ -64,6 +68,17 @@ func main() {
 				handleErr(err)
 			}
 		}(clientInput)
+	}
+
+	if *cpuProfile != "" {
+		f, err := os.Create(*cpuProfile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
 	}
 
 	clientsReady.Wait()

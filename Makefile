@@ -35,3 +35,6 @@ build: dependencies
 
 build-linux: dependencies
 	GOOS=linux GOARCH=amd64 go build -o bin/numserver
+
+profile-cpu:
+	go run cmd/test/stress.go -cpuprofile stress.cpu && pprof -http=:8080 stress.cpu

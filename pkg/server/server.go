@@ -52,8 +52,10 @@ func (s *NumServer) Run(ctx context.Context) {
 }
 
 func (s *NumServer) stop() {
-	s.runtime.stop()
-	close(s.Stopped)
+	if s.runtime.isUp.IsSet() {
+		s.runtime.stop()
+		close(s.Stopped)
+	}
 }
 
 func (s *NumServer) waitForClientStop() {
